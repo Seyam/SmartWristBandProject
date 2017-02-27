@@ -10,6 +10,7 @@ var mongoose = require('mongoose');
 
 
 var m = require('mraa');
+const mqtt = require('mqtt');
 var Ms = require('microseconds');
 var request = require('request');
 var moment = require('moment');
@@ -24,6 +25,15 @@ console.log('MRAA Version: ' + m.getVersion());
 //var soundSensor = new m.Aio(0);
 
 //var threshold = 500; 
+
+const broker = mqtt.connect('mqtt://iot.eclipse.org');
+
+broker.on('connect', function () {
+    //broker.subscribe('light');
+    //broker.publish('light-status', state);
+    console.log('I get executed Once and I\'m Connected To The Broker');
+});
+
 
 mongoose.connect('mongodb://192.168.10.216/myDB');
 
@@ -64,8 +74,8 @@ var trigPin = new m.Gpio(11);
 var LEDPin = new m.Gpio(13);
 
 
-var loopDelay = 60; // ms
-var threshold = 5; //cm
+var loopDelay = 250; // ms
+var threshold = 100; //cm
 var LOW = 0;
 var HIGH = 1;
 
@@ -120,75 +130,59 @@ setInterval(function(){
     if(distance <= threshold){
 
       var currentTime = moment().tz("Asia/Dhaka").format('YYYY/MM/DD HH:mm:ss');
+      
       var sensorData = {"sdata": distance, "did":"0001", "dtime":currentTime};
 
+      var serializedData = JSON.stringify(sensorData);
 
-      request(
-      {
-        method: 'POST',
-        //url: 'http://192.168.10.107:80/sounddata',
-        url: 'https://dweet.io/dweet/for/seyam-thing',
-        json: false,
-        headers: {
-            "content-type": "application/json",            
-        },
-        body: JSON.stringify(data)
+      broker.publish('sonar',distance.toString());
+      console.log('published!');
 
-      }, function(error, response, body){
+     //  request(
+     //  {
+     //    method: 'POST',
+     //    //url: 'http://192.168.10.107:80/sounddata',
+     //    url: 'https://dweet.io/dweet/for/seyam-thing',
+     //    json: false,
+     //    headers: {
+     //        "content-type": "application/json",            
+     //    },
+     //    body: JSON.stringify(sensorData)
+
+     //  }, function(error, response, body){
       
-			  //console.log(response);
-		     
-		      if(response.statusCode === 200){
-		        console.log('posted successfully with a sound value of ' + distance ); 
-		      }
+        // //console.log(response);
+         
+       //    if(response.statusCode === 200){
+       //      console.log('Posted value: ' + distance ); 
+       //    }
 
-		      else{
-		        console.log('oops, there was an error');
-		        console.log(response.statusCode + ' :::: ' + response.body);
-		      }
-    	});
+       //    else{
+       //      console.log('oops, there was an error');
+       //      console.log(response.statusCode + ' :::: ' + response.body);
+       //    }
+      // });
 
 
               
 
-              db.collection('sensordatas').insert(sensorData, function (err, result) {
-                    if (err)
-                       console.log('Error');
-                    else
-                       console.log('Success');
-              });
+      // db.collection('sensordatas').insert(sensorData, function (err, result) {
+      //       if (err)
+      //          console.log('Error');
+      //       else
+      //          console.log('Success');
+      // });
 
     }
 
 }, loopDelay);
 
 
-app.get('/api/all', function (req, res) {
-   fs.readFile( __dirname + "/" + "sensor_database.json", 'utf8', function (err, data) {
-       var read_data=JSON.parse(data);       
-       res.json(read_data);
-       //res.end( data );
-       console.log(read_data);
-
-   });
-});
-
-
-app.get('/api/:name', function (req, res) {
-   // First read existing users.
-   fs.readFile( __dirname + "/" + "sensor_database.json", 'utf8', function (err, data) {
-       sensordata = JSON.parse( data );
-       var dataRequested = sensordata[req.params.name]
-       console.log( dataRequested );
-       res.json(dataRequested);
-       //res.end( JSON.stringify(dataRequested));
-   });
-})
 
 
 
 app.get('/data', function (req, res) {
-   	   //var dataRetrieved = db.getCollection('SensorData').find({});
+       //var dataRetrieved = db.getCollection('SensorData').find({});
        SensorData.find({/*json object key */}, function (err, docs) {
           //var dt = JSON.parse(docs);
           console.log(docs);
@@ -202,56 +196,56 @@ app.get('/data', function (req, res) {
 
 
 
-app.get('/1', function (req, res) {
+// app.get('/1', function (req, res) {
    
-      var val = db.SensorData.find().pretty();
-      console.log(val);
+//       var val = db.SensorData.find().pretty();
+//       console.log(val);
 
-      res.json(val);
-      //res.end( data );
-})
+//       res.json(val);
+//       //res.end( data );
+// })
 
 
 
-app.delete('/api/:name', function (req, res) {
+// app.delete('/api/:name', function (req, res) {
 
-   // First read existing users.
-   fs.readFile( __dirname + "/" + "sensor_database.json", 'utf8', function (err, data) {
-       data = JSON.parse( data );
-       delete data[req.params.name];
+//    // First read existing users.
+//    fs.readFile( __dirname + "/" + "sensor_database.json", 'utf8', function (err, data) {
+//        data = JSON.parse( data );
+//        delete data[req.params.name];
        
-       console.log( data );
-       res.json(data);
-       //res.end( JSON.stringify(data));
-   });
-})
+//        console.log( data );
+//        res.json(data);
+//        //res.end( JSON.stringify(data));
+//    });
+// })
 
 
-app.put('/api/:name', function (req, res, next) {
-  //console.log(req.body);
+// app.put('/api/:name', function (req, res, next) {
+//   //console.log(req.body);
   
-  fs.readFile(__dirname+'/sensor_database.json','utf8',function(err,data){
-    data=JSON.parse(data);
+//   fs.readFile(__dirname+'/sensor_database.json','utf8',function(err,data){
+//     data=JSON.parse(data);
 
-    data[req.params.name]=req.body;
+//     data[req.params.name]=req.body;
     
-    //data[req.params.name]=bodydata;
+//     //data[req.params.name]=bodydata;
 
-    console.log(data);
-    res.json(data);
-    //var dataSerialized = JSON.stringify(data);
-    //res.json(dataSerialized);
-    //fs.writeFile('/sensor_database.json',dataSerialized);
-  });
+//     console.log(data);
+//     res.json(data);
+//     //var dataSerialized = JSON.stringify(data);
+//     //res.json(dataSerialized);
+//     //fs.writeFile('/sensor_database.json',dataSerialized);
+//   });
 
-})
+// })
 
 
 
-app.post('/', function(req, res) {
-   // Insert JSON straight into MongoDB
+// app.post('/', function(req, res) {
+//    // Insert JSON straight into MongoDB
  
-})
+// })
 
 
 
