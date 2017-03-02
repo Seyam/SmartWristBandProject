@@ -63,6 +63,7 @@
 			if(msg.topic=="sonar"){
 				// $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
                 $("h1").text("Object distance = " + jsonData['sdata']+" cm");
+                $("#time").text("Time = " + jsonData['dtime']);
 			}
 
             if(msg.payload=="1"){
@@ -91,8 +92,16 @@
         </div>
 
 
+
         <div id="status_box_1" class="blink">
              <h2></h2>
+        </div>
+
+
+
+        <div id="time">
+            <h1>Time Bar</h1>
+        
         </div>
 
 <!-- 		    <table>
@@ -106,6 +115,11 @@
 			</table> -->
 
     </div>
+
+
+
+
+
      
 
  
