@@ -3,6 +3,12 @@
   seyam.bd.net@gmail.com
 ------------------------------ */
 
+// var express = require('express');
+// var app = express();
+// var fs = require("fs");
+// var bodyParser = require('body-parser');
+// var mongoose = require('mongoose');
+
 //var sys = require('sys');
 //var net = require('net');
 var sys = require('util');
@@ -15,6 +21,11 @@ var connections=[];
 const broker = mqtt.connect('mqtt://iot.eclipse.org')
 broker.subscribe('sonar');
 console.log('subscribed to topic sonar');
+broker.subscribe('feedback');
+console.log('subscribed to topic \'feedback\'');
+
+
+//mongoose.connect('mongodb://192.168.10.216/myDB');
 
 //Multiple sockets requests handler 
 io.sockets.on('connection', function (SocketIOclient) {
@@ -51,7 +62,7 @@ io.sockets.on('connection', function (SocketIOclient) {
 // // listen to messages coming from the mqtt broker[Not Required Here]
 broker.on('message', function (topic, payload, packet) {
     console.log(topic+'='+payload);
-    io.sockets.emit('mqttData',{'topic':String(topic),
+    io.sockets.emit('mqttData', {'topic':String(topic),
                             'payload':String(payload)});
 });
 
