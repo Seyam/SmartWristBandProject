@@ -55,13 +55,25 @@
 	}
 	var socket = io.connect('http://192.168.10.216:5000'); // change the ip address with server IP address
 	socket.on('connect', function () {
-		socket.on('weightStatus', function (msg) {
+		socket.on('mqttData', function (msg) {
 			console.log(msg.topic+' '+msg.payload);
-            //var =JSON.
-			if(msg.topic=="weightStatus"){
+            var jsonData=JSON.parse(msg.payload);
+            //console.log(jsonData['sdata']);
+
+			if(msg.topic=="sonar"){
 				// $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
-                $("h2").text("Distance To Object : " + msg.payload+" centimeter");
+                $("h1").text("Object distance = " + jsonData['sdata']+" cm");
 			}
+
+            if(msg.payload=="1"){
+                // $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
+                $("h2").text("Vibrating...");
+            }
+
+            else{
+                // $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
+                $("h2").text("No Vibration!");
+            }
 		});
 		//socket.emit('subscribe',{topic:'light'});
 		//socket.emit('subscribe',{topic:'light-status'});
