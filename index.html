@@ -40,31 +40,31 @@
 
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     <title>Hello World</title>
-	
-	<script src="js/socket.io.min.js"></script>
+    
+    <script src="js/socket.io.min.js"></script>
     <script src="js/jquery-2.1.0.min.js"></script>
 
-	<script>
+    <script>
     $(document).ready(function() {
     });
-	function LedON(){
-		//socket.emit('publish', {topic:"light",payload:"on"});
-	}
-	function LedOFF(){
-		//socket.emit('publish', {topic:"light",payload:"off"});
-	}
-	var socket = io.connect('http://192.168.10.216:5000'); // change the ip address with server IP address
-	socket.on('connect', function () {
-		socket.on('mqttData', function (msg) {
-			console.log(msg.topic+' '+msg.payload);
+    function LedON(){
+        //socket.emit('publish', {topic:"light",payload:"on"});
+    }
+    function LedOFF(){
+        //socket.emit('publish', {topic:"light",payload:"off"});
+    }
+    var socket = io.connect('http://192.168.10.216:5000'); // change the ip address with server IP address
+    socket.on('connect', function () {
+        socket.on('mqttData', function (msg) {
+            console.log(msg.topic+' '+msg.payload);
             var jsonData=JSON.parse(msg.payload);
             //console.log(jsonData['sdata']);
 
-			if(msg.topic=="sonar"){
-				// $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
+            if(msg.topic=="sonar"){
+                // $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
                 $("h1").text("Object distance = " + jsonData['sdata']+" cm");
                 $("#time").text("Time = " + jsonData['dtime']);
-			}
+            }
 
             if(msg.payload=="1"){
                 // $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
@@ -73,12 +73,26 @@
 
             else{
                 // $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
-                $("h2").text("No Vibration!");
+                $("h2").text("");
             }
-		});
-		//socket.emit('subscribe',{topic:'light'});
-		//socket.emit('subscribe',{topic:'light-status'});
-	});
+        });
+
+
+        socket.on('user', function (msg) {
+            console.log(msg.topic+' '+msg.payload);
+            //var jsonData=JSON.parse(msg.payload);
+            //console.log(jsonData['sdata']);
+
+            if(msg.topic=="connections"){
+                // $("#status_box_1").text("Distance To Object : " + msg.payload+" centimeter");
+                $("#user").text("Connected User = " + msg.payload);
+                
+            }
+            
+        });
+        //socket.emit('subscribe',{topic:'light'});
+        //socket.emit('subscribe',{topic:'light-status'});
+    });
 </script>
 
 </head>
@@ -88,7 +102,7 @@
         <h1>Real Time Data</h1>
         <div id="deviceready" class="blink">
             <p class="event listening">Connected to server</p>
-            <p class="event received">Hello World</p>
+            <!-- <p class="event received">Hello World</p> -->
         </div>
 
 
@@ -104,15 +118,20 @@
         
         </div>
 
-<!-- 		    <table>
-			  <tr>
-				<td id="status_box" style='vertical-align: middle !important;'></td>
-				<td>
-				  <input type='button' value="ON" onclick="LedON()"/><br/>
-				  <input type='button' value="OFF" onclick="LedOFF()"/><br/>
-				</td>
-			  </tr>
-			</table> -->
+
+        <div id="user">
+            <h1>User</h1>        
+        </div>
+
+<!--            <table>
+              <tr>
+                <td id="status_box" style='vertical-align: middle !important;'></td>
+                <td>
+                  <input type='button' value="ON" onclick="LedON()"/><br/>
+                  <input type='button' value="OFF" onclick="LedOFF()"/><br/>
+                </td>
+              </tr>
+            </table> -->
 
     </div>
 

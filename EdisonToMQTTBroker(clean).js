@@ -104,23 +104,28 @@ setInterval(function(){
 
       var currentTime = moment().tz("Asia/Dhaka").format('YYYY/MM/DD HH:mm:ss');
       
-      var sensorData = {"sdata": distance, "did":"0001", "dtime":currentTime};//This JSON Object can be directly inserted into MongoDB
+      var sensorData = {"sdata": distance, "did":"0001", "dtime":currentTime, "status":"Alerted"};//This JSON Object can be directly inserted into MongoDB
 
       var serializedData = JSON.stringify(sensorData); //Stringifying required before publishing to MQTT broker
 
       // broker.publish('sonar', distance.toString());
       broker.publish('sonar', serializedData);
-      console.log('published!');
+      //console.log('published!');
 
 
       if(distance <= 10){
 
-        PythonShell.run('1.py', function (err) {
+        broker.publish('feedback', '1');
+
+        PythonShell.run('4.py', function (err) {
           if (err) throw err;
-          console.log('Vibration!!!');
-          broker.publish('feedback', '1');
+          //console.log('Vibration!!!');
+          
         });
 
+        // sensorData["status"]="Alerted";
+        // var serializedData = JSON.stringify(sensorData); //Stringifying required before publishing to MQTT broker
+        // broker.publish('fbData', sensorData);
         
       }
 
@@ -128,23 +133,26 @@ setInterval(function(){
 
       else if(distance>10 && distance<=20){
 
-        PythonShell.run('2.py', function (err) {
+        broker.publish('feedback', '1');
+
+        PythonShell.run('3.py', function (err) {
           if (err) throw err;
-          console.log('Vibration!!!');
-          broker.publish('feedback', '1');
+          // console.log('Vibration!!!');
+          
         });
 
-        
       }
 
 
 
       else if(distance>20 && distance<=30){
 
-        PythonShell.run('3.py', function (err) {
+        broker.publish('feedback', '1');
+
+        PythonShell.run('2.py', function (err) {
           if (err) throw err;
-          console.log('Vibration!!!');
-          broker.publish('feedback', '1');
+          // console.log('Vibration!!!');
+          // broker.publish('feedback', '1');
         });
 
       }
@@ -153,10 +161,12 @@ setInterval(function(){
 
       else if(distance>30 && distance<=40){
 
-        PythonShell.run('4.py', function (err) {
+        broker.publish('feedback', '1');
+
+        PythonShell.run('1.py', function (err) {
           if (err) throw err;
-          console.log('Vibration!!!');
-          broker.publish('feedback', '1');
+          // console.log('Vibration!!!');
+          
         });
 
       }
